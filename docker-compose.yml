@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: skillsync
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d skillsync"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/skillsync
+      SECRET_KEY: local-development-secret-change-in-production
+      FRONTEND_URL: http://localhost:5173
+    ports: ["8000:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_API_URL: http://localhost:8000/api/v1
+    ports: ["5173:80"]
+    depends_on: [backend]
+volumes:
+  postgres_data:
+

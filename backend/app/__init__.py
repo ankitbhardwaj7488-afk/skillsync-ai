@@ -1,0 +1,2 @@
+"""SkillSync AI backend package."""
+
