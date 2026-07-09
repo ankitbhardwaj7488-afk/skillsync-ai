@@ -13,6 +13,8 @@ services:
       retries: 10
   backend:
     build: ./backend
+    env_file:
+      - ./backend/.env
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/skillsync
       SECRET_KEY: local-development-secret-change-in-production
@@ -28,4 +30,3 @@ services:
     depends_on: [backend]
 volumes:
   postgres_data:
-

@@ -541,6 +541,12 @@ export default function App() {
   });
   const [auth, setAuth] = useState<AuthMode>(null);
   useEffect(() => {
+    if (window.location.hostname === "127.0.0.1") {
+      window.location.replace(
+        `http://localhost:${window.location.port}${window.location.pathname}${window.location.search}${window.location.hash}`,
+      );
+      return;
+    }
     const params = new URLSearchParams(window.location.search);
     if (window.location.pathname === "/oauth/callback" && params.get("error")) {
       setAuth("login");
@@ -562,7 +568,8 @@ export default function App() {
     return (
       <Dashboard
         user={user}
-        onLogout={() => {
+        onLogout={async () => {
+          await api("/auth/logout", { method: "POST" }).catch(() => {});
           clearAuth();
           setUser(null);
         }}

@@ -15,30 +15,31 @@ class OAuthProvider:
     scopes: tuple[str, ...]
 
 
-PROVIDERS = {
-    "google": OAuthProvider(
-        "https://accounts.google.com/o/oauth2/v2/auth",
-        "https://oauth2.googleapis.com/token",
-        "https://openidconnect.googleapis.com/v1/userinfo",
-        settings.google_client_id,
-        settings.google_client_secret,
-        settings.google_redirect_uri,
-        ("openid", "email", "profile"),
-    ),
-    "linkedin": OAuthProvider(
-        "https://www.linkedin.com/oauth/v2/authorization",
-        "https://www.linkedin.com/oauth/v2/accessToken",
-        "https://api.linkedin.com/v2/userinfo",
-        settings.linkedin_client_id,
-        settings.linkedin_client_secret,
-        settings.linkedin_redirect_uri,
-        tuple(["openid", "profile", "email", *settings.linkedin_extra_scopes.split()]),
-    ),
-}
+def providers() -> dict[str, OAuthProvider]:
+    return {
+        "google": OAuthProvider(
+            "https://accounts.google.com/o/oauth2/v2/auth",
+            "https://oauth2.googleapis.com/token",
+            "https://openidconnect.googleapis.com/v1/userinfo",
+            settings.google_client_id,
+            settings.google_client_secret,
+            settings.google_redirect_uri,
+            ("openid", "email", "profile"),
+        ),
+        "linkedin": OAuthProvider(
+            "https://www.linkedin.com/oauth/v2/authorization",
+            "https://www.linkedin.com/oauth/v2/accessToken",
+            "https://api.linkedin.com/v2/userinfo",
+            settings.linkedin_client_id,
+            settings.linkedin_client_secret,
+            settings.linkedin_redirect_uri,
+            tuple(["openid", "profile", "email", *settings.linkedin_extra_scopes.split()]),
+        ),
+    }
 
 
 def provider_config(name: str) -> OAuthProvider:
-    provider = PROVIDERS.get(name)
+    provider = providers().get(name)
     if not provider:
         raise ValueError("Unsupported OAuth provider")
     if not provider.client_id or not provider.client_secret:
